@@ -18,19 +18,19 @@ def copydata():
         cnt += 1
 
 def checkscreen():
-    w.blit(h2font.render("Name of Item          Stock          Price", True, (0, 0, 0)), (50, 175))
+    w.blit(h2font.render("Name of Item                            Stock      Price", True, (0, 0, 0)), (50, 175))
     if not(place):
-        w.blit(h2font.render("Price to Manufacture", True, (0, 0, 0)), (600, 175))
+        w.blit(h2font.render("Price to Manufacture", True, (0, 0, 0)), (800, 175))
     count = 0
     while (count + checkmult) != len(data):
         t2 = "$" + str(format(data[count + checkmult][2], ".2f"))
         t3 = "$" + str(format(data[count + checkmult][3], ".2f"))
         t1 = str(round(data[count + checkmult][1]))
         w.blit(h3mfont.render((data[count + checkmult][0]), True, (placeclr[count])), (50, (count + 1) * 25 + 200))
-        w.blit(h3mfont.render((t1), True, (placeclr[count])), (310, (count + 1) * 25 + 200))
-
+        w.blit(h3mfont.render((t1), True, (placeclr[count])), (510, (count + 1) * 25 + 200))
+        w.blit(h3mfont.render((t2), True, (placeclr[count])), (650, (count + 1) * 25 + 200))
         if not(place):
-            w.blit(h3mfont.render((t3), True, (placeclr[count])), (600, (count + 1) * 25 + 200))
+            w.blit(h3mfont.render((t3), True, (placeclr[count])), (800, (count + 1) * 25 + 200))
         count += 1
 
 try:
@@ -59,6 +59,7 @@ placeselect = 0
 placeselectedit = 0
 write = False
 selectclr = (0,0,0)
+selectlist = [0,1,2]
 
 editmult = 1
 
@@ -108,28 +109,14 @@ while run:
                         clr[select] = (255,255,255)
                     else:
                         select = 1
-                    if select == 0:
-                        select = 2
-                    elif select == 1:
-                        select = 0
-                    elif select == 2:
-                        select = 1
-                    else:
-                        select = 0
+                    select = (2,0,1)[select]
                     clr[select] = (210,210,210)
                 elif key == pygame.K_RIGHT:
                     if select != 10:
                         clr[select] = (255,255,255)
                     else:
                         select = 1
-                    if select == 0:
-                        select = 1
-                    elif select == 1:
-                        select = 2
-                    elif select == 2:
-                        select = 0
-                    else:
-                        select = 0
+                    select = (1,2,0)[select]
                     clr[select] = (210,210,210)
                 elif key == pygame.K_KP_ENTER or key == pygame.K_RETURN and screen == "menu":
                     if select == 0:
@@ -167,26 +154,10 @@ while run:
                     data = sorted(data, key=itemgetter(3))
 
                 ### EDIT/PLACE KEYS ###
-                elif key == pygame.K_F5:
-                    editmult = 0.01
-                elif key == pygame.K_F6:
-                    editmult = 0.10
-                elif key == pygame.K_F7:
-                    editmult = 0.50
-                elif key == pygame.K_F8:
-                    editmult = 1
+                if 286 <= key <= 293:
+                    editmult = (0.01,0.10,0.50,1,2,5,10,50)[[pygame.K_F5,pygame.K_F6,pygame.K_F7,pygame.K_F8,pygame.K_F9,pygame.K_F10,pygame.K_F11,pygame.K_F12].index(key)]
 
-                elif key == pygame.K_F9:
-                    editmult = 2
-                elif key == pygame.K_F10:
-                    editmult = 5
-                elif key == pygame.K_F11:
-                    editmult = 10
-                elif key == pygame.K_F12:
-                    editmult = 50
-
-
-                elif place == True or edit == True:
+                if place == True or edit == True:
                     ### EDIT/PLACE UP/DOWN BROWSING KEYS ###
                     if key == pygame.K_DOWN and placeselect + 1 < len(data):
                         placeselect += 1
@@ -226,7 +197,7 @@ while run:
                                     placeselectedit = 1
                                 else:
                                     if placeselect < len(data):
-                                        if len(data[placeselect][placeselectedit]) + 1 != 19:
+                                        if len(data[placeselect][placeselectedit]) < 34:
                                             data[placeselect][placeselectedit] += event.unicode
 
                     else:
@@ -268,15 +239,15 @@ while run:
             else:
                 selectclr = (0,0,0)
             if placeselectedit == 0:
-                pygame.draw.rect(w, selectclr, (45, (placeselect + 1) * 25 + 196, 250, 30), 2)
+                pygame.draw.rect(w, selectclr, (45, (placeselect + 1) * 25 + 196, 450, 30), 2)
             elif placeselectedit == 1:
-                pygame.draw.rect(w, selectclr, (305, (placeselect + 1) * 25 + 196, 100, 30), 2)
+                pygame.draw.rect(w, selectclr, (505, (placeselect + 1) * 25 + 196, 100, 30), 2)
             elif placeselectedit == 2:
-                pygame.draw.rect(w, selectclr, (450, (placeselect + 1) * 25 + 196, 100, 30), 2)
+                pygame.draw.rect(w, selectclr, (650, (placeselect + 1) * 25 + 196, 100, 30), 2)
             else:
-                pygame.draw.rect(w, selectclr, (595, (placeselect + 1) * 25 + 196, 100, 30), 2)
+                pygame.draw.rect(w, selectclr, (795, (placeselect + 1) * 25 + 196, 100, 30), 2)
         elif place == True:
-            pygame.draw.rect(w, selectclr, (45, (placeselect + 1) * 25 + 196, 600, 30), 2)
+            pygame.draw.rect(w, selectclr, (45, (placeselect + 1) * 25 + 196, 700, 30), 2)
 
     pygame.display.update()
     pygame.time.delay(100)
