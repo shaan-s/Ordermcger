@@ -21,17 +21,23 @@ def checkscreen():
     w.blit(h2font.render("Name of Item                            Stock      Price", True, (0, 0, 0)), (50, 175))
     if not(place):
         w.blit(h2font.render("Price to Manufacture", True, (0, 0, 0)), (800, 175))
+        w.blit(h2font.render("Margins", True, (0, 0, 0)), (1200, 175))
     count = 0
     while (count + checkmult) != len(data):
-        t2 = "$" + str(format(data[count + checkmult][2], ".2f"))
-        t3 = "$" + str(format(data[count + checkmult][3], ".2f"))
+        t2 = str(format(data[count + checkmult][2], ".2f"))
+        t3 = str(format(data[count + checkmult][3], ".2f"))
         t1 = str(round(data[count + checkmult][1]))
         w.blit(h3mfont.render((data[count + checkmult][0]), True, (placeclr[count])), (50, (count + 1) * 25 + 200))
-        w.blit(h3mfont.render((t1), True, (placeclr[count])), (510, (count + 1) * 25 + 200))
-        w.blit(h3mfont.render((t2), True, (placeclr[count])), (650, (count + 1) * 25 + 200))
+        w.blit(h3mfont.render(t1, True, (placeclr[count])), (510, (count + 1) * 25 + 200))
+        w.blit(h3mfont.render("$"+t2, True, (placeclr[count])), (650, (count + 1) * 25 + 200))
         if not(place):
-            w.blit(h3mfont.render((t3), True, (placeclr[count])), (800, (count + 1) * 25 + 200))
+            w.blit(h3mfont.render("$"+t3, True, (placeclr[count])), (800, (count + 1) * 25 + 200))
+            try:
+                w.blit(h3mfont.render(str(round(float(t2)/float(t3)*100))+"%", True, (placeclr[count])), (1200, (count + 1) * 25 + 200))
+            except:
+                w.blit(h3mfont.render("Err", True, (placeclr[count])), (1200, (count + 1) * 25 + 200))
         count += 1
+
 
 try:
     config = open("config.txt", "r")
@@ -59,7 +65,7 @@ placeselect = 0
 placeselectedit = 0
 write = False
 selectclr = (0,0,0)
-selectlist = [0,1,2]
+confirmdelete = False
 
 editmult = 1
 
@@ -90,7 +96,6 @@ h3font = pygame.font.SysFont("bahnschrift", 24, 0, 0)
 h3mfont = pygame.font.SysFont("consolas", 24, 0, 0)
 w = pygame.display.set_mode((1467,750))
 pygame.display.set_caption(cap)
-
 
 
 
@@ -158,6 +163,8 @@ while run:
                     editmult = (0.01,0.10,0.50,1,2,5,10,50)[[pygame.K_F5,pygame.K_F6,pygame.K_F7,pygame.K_F8,pygame.K_F9,pygame.K_F10,pygame.K_F11,pygame.K_F12].index(key)]
 
                 if place == True or edit == True:
+                    if key != pygame.K_DELETE and confirmdelete:
+                        confirmdelete = False
                     ### EDIT/PLACE UP/DOWN BROWSING KEYS ###
                     if key == pygame.K_DOWN and placeselect + 1 < len(data):
                         placeselect += 1
@@ -177,8 +184,13 @@ while run:
                             if write == False:
                                 data.append(["New Item", 0, 0, 0 ])
                         elif key == pygame.K_DELETE:
-                            del data[placeselect]
-                            placeselect -= 1
+                            if confirmdelete:
+                                del data[placeselect]
+                                confirmdelete = False
+                                if not data:
+                                    data.append(["Item", 0, 0, 0 ])
+                            else:
+                                confirmdelete = True
                         elif placeselectedit != 0:
                             if key == pygame.K_RSHIFT:
                                 data[placeselect][placeselectedit] += editmult
@@ -203,10 +215,9 @@ while run:
                     else:
                         if key == pygame.K_KP_ENTER or key == pygame.K_RETURN:
                             data[placeselect][1] -= editmult
-
-
-
-    w.fill((150,150,150))
+    w.fill((170,170,170))
+    if confirmdelete:
+        w.blit(h3mfont.render("! Are you sure? Press DELETE again to confirm, or any other key to cancel. !", True, (100,0,0)), (400,100))
     for x in range(len(data)):
         if data[x][1] <= 10 and data[x][1] > 0:
             placeclr[x] = (255, 255,0)
@@ -248,7 +259,5 @@ while run:
                 pygame.draw.rect(w, selectclr, (795, (placeselect + 1) * 25 + 196, 100, 30), 2)
         elif place == True:
             pygame.draw.rect(w, selectclr, (45, (placeselect + 1) * 25 + 196, 700, 30), 2)
-
     pygame.display.update()
-    pygame.time.delay(100)
 pygame.quit()
